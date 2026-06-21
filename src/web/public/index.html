@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,viewport-fit=cover">
+<meta name="theme-color" content="#080C12">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="description" content="Antares Manager - Professional Minecraft Bot Management Dashboard">
+<title>Antares Manager</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E⬡%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<div id="app" class="app">
+
+
+  <header class="topbar" role="banner">
+    <div class="topbar-brand">
+      <span class="brand-logo" aria-hidden="true">⬡</span>
+      <span class="brand-name">ANTARES MANAGER</span>
+    </div>
+    <div class="topbar-center">
+      <span id="hdr-live" class="status-badge live" aria-label="Server connected">
+        <span class="status-dot"></span>
+        <span>LIVE</span>
+      </span>
+      <span id="hdr-count" class="topbar-pill">0 Bot Online</span>
+    </div>
+    <div class="topbar-end">
+      <span id="hdr-time" class="topbar-clock" aria-live="polite"></span>
+      <button class="icon-btn" id="btn-refresh" title="Làm mới (Ctrl+R)" aria-label="Làm mới">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.3"/></svg>
+      </button>
+      <button class="icon-btn" id="btn-help" title="Phím tắt (?)" aria-label="Phím tắt">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      </button>
+    </div>
+  </header>
+
+
+  <div id="dc-banner" class="dc-banner" role="alert" style="display:none">
+    <span class="dc-icon">⚠</span>
+    <span>Mất kết nối server — <span id="dc-reason"></span></span>
+  </div>
+
+  <div class="body">
+
+    <aside class="sidebar" id="sidebar" role="navigation" aria-label="Sidebar">
+      <div class="sidebar-search">
+        <svg class="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input class="search-input" id="sb-search" type="text" placeholder="Tìm bot theo tên, UUID, server..." aria-label="Tìm kiếm bot" autocomplete="off">
+      </div>
+
+      <div class="sidebar-stats" id="sb-stats">
+        <div class="stat-bar">
+          <div class="stat-bar-header">
+            <span class="stat-bar-label">RAM Usage</span>
+            <span class="stat-bar-value" id="sb-ram-pct">0%</span>
+          </div>
+          <div class="stat-bar-track"><div class="stat-bar-fill" id="sb-ram-fill" style="width:0%"></div></div>
+        </div>
+        <div class="stat-bar">
+          <div class="stat-bar-header">
+            <span class="stat-bar-label">Bot Usage</span>
+            <span class="stat-bar-value" id="sb-bot-pct">0/0</span>
+          </div>
+          <div class="stat-bar-track"><div class="stat-bar-fill" id="sb-bot-fill" style="width:0%"></div></div>
+        </div>
+        <div class="stat-bar">
+          <div class="stat-bar-header">
+            <span class="stat-bar-label">Network</span>
+            <span class="stat-bar-value" id="sb-net-val">0 pps</span>
+          </div>
+          <div class="stat-bar-track"><div class="stat-bar-fill" id="sb-net-fill" style="width:0%"></div></div>
+        </div>
+        <div class="stat-bar">
+          <div class="stat-bar-header">
+            <span class="stat-bar-label">CPU Usage</span>
+            <span class="stat-bar-value" id="sb-cpu-pct">0%</span>
+          </div>
+          <div class="stat-bar-track"><div class="stat-bar-fill" id="sb-cpu-fill" style="width:0%"></div></div>
+        </div>
+      </div>
+
+      <div class="sidebar-cap" id="sb-cap" style="display:none">
+        <div class="stat-bar">
+          <div class="stat-bar-header">
+            <span class="stat-bar-label">Capacity</span>
+            <span class="stat-bar-value" id="sb-cap-pct">0%</span>
+          </div>
+          <div class="stat-bar-track"><div class="stat-bar-fill" id="sb-cap-fill" style="width:0%"></div></div>
+          <div class="stat-bar-sub" id="sb-cap-info"></div>
+        </div>
+      </div>
+
+      <div class="sidebar-list" id="sb-list" role="list" aria-label="Danh sách bot"></div>
+
+      <button class="sidebar-add" id="btn-add-bot" aria-label="Thêm bot mới">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Thêm Bot
+      </button>
+    </aside>
+
+
+    <div class="sidebar-backdrop" id="sidebar-backdrop" aria-hidden="true"></div>
+    <button class="menu-toggle" id="menu-toggle" aria-label="Mở sidebar" aria-expanded="false">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+
+
+    <nav class="mobile-nav" id="mobile-nav" role="navigation" aria-label="Mobile navigation">
+      <div class="mobile-nav-inner">
+        <button class="mobile-nav-item active" data-mtab="home" aria-label="Trang chủ">
+          <span class="mobile-nav-icon">⬡</span>
+          <span class="mobile-nav-label">Home</span>
+        </button>
+        <button class="mobile-nav-item" data-mtab="bots" aria-label="Danh sách bot" id="mnav-bots">
+          <span class="mobile-nav-icon">◈</span>
+          <span class="mobile-nav-label">Bots</span>
+        </button>
+        <button class="mobile-nav-item" data-mtab="manager" aria-label="Quản lý">
+          <span class="mobile-nav-icon">◫</span>
+          <span class="mobile-nav-label">Quản Lý</span>
+        </button>
+        <button class="mobile-nav-item" data-mtab="console" aria-label="Console">
+          <span class="mobile-nav-icon">▤</span>
+          <span class="mobile-nav-label">Console</span>
+        </button>
+        <button class="mobile-nav-item" data-mtab="system" aria-label="Hệ thống">
+          <span class="mobile-nav-icon">◉</span>
+          <span class="mobile-nav-label">System</span>
+        </button>
+      </div>
+    </nav>
+
+    <main class="main" id="main" role="main">
+
+      <div class="no-sel" id="no-sel">
+        <div class="no-sel-logo" aria-hidden="true">⬡</div>
+        <div class="no-sel-title">Chọn một bot để xem chi tiết</div>
+        <div class="no-sel-sub">hoặc quản lý tất cả bot qua tab Quản Lý</div>
+      </div>
+
+
+      <div id="bot-view" style="display:none" class="bot-view">
+
+        <div class="bulk-bar" id="bulk-bar" style="display:none"></div>
+
+
+        <div class="action-bar" id="action-bar"></div>
+
+
+        <nav class="tabs" id="tabs" role="tablist" aria-label="Bot tabs">
+          <button class="tab" data-tab="overview" role="tab" aria-selected="false">Tổng Quan</button>
+          <button class="tab" data-tab="manager" role="tab" aria-selected="false">Quản Lý</button>
+          <button class="tab" data-tab="inventory" role="tab" aria-selected="false">Kho Đồ</button>
+          <button class="tab" data-tab="commands" role="tab" aria-selected="false">Lệnh</button>
+          <button class="tab" data-tab="logs" role="tab" aria-selected="false">Console</button>
+          <button class="tab" data-tab="proxy" role="tab" aria-selected="false">Proxy</button>
+          <button class="tab" data-tab="config" role="tab" aria-selected="false">Cấu Hình</button>
+          <button class="tab" data-tab="stats" role="tab" aria-selected="false">Thống Kê</button>
+          <button class="tab" data-tab="system" role="tab" aria-selected="false">Hệ Thống</button>
+        </nav>
+
+
+        <div class="tab-content" id="tab-content" role="tabpanel"></div>
+      </div>
+    </main>
+  </div>
+</div>
+
+
+<div class="overlay" id="overlay-edit-bot" role="dialog" aria-modal="true" aria-labelledby="edit-bot-title">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 class="modal-title" id="edit-bot-title">Sửa Bot: <span id="edit-bot-title-id"></span></h2>
+      <button class="modal-close" data-close="overlay-edit-bot" aria-label="Đóng">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" for="edit-bot-host">Host</label>
+          <input class="form-input" id="edit-bot-host" placeholder="server.com" autocomplete="off">
+        </div>
+        <div class="form-group form-group-sm">
+          <label class="form-label" for="edit-bot-port">Port</label>
+          <input class="form-input" id="edit-bot-port" type="number" autocomplete="off">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" for="edit-bot-user">Username</label>
+          <input class="form-input" id="edit-bot-user" placeholder="BotName" autocomplete="off">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="edit-bot-ver">Version</label>
+          <input class="form-input" id="edit-bot-ver" placeholder="1.21.1" autocomplete="off">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="edit-bot-pass">Password (để trống nếu không đổi)</label>
+        <input class="form-input" id="edit-bot-pass" placeholder="(giữ nguyên mật khẩu cũ)" type="password" autocomplete="off">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" for="edit-bot-owner">Owner Username</label>
+          <input class="form-input" id="edit-bot-owner" placeholder="TenCuaBan" autocomplete="off">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="edit-bot-menu">Menu Command</label>
+          <input class="form-input" id="edit-bot-menu" placeholder="/menu" autocomplete="off">
+        </div>
+      </div>
+      <div class="form-row form-row-check">
+        <label class="check-label">
+          <input type="checkbox" id="edit-bot-automenu" checked> Auto Menu
+        </label>
+        <label class="check-label">
+          <input type="checkbox" id="edit-bot-proxy" onchange="toggleEditProxySelect()"> Use Proxy
+        </label>
+      </div>
+      <div class="form-group" id="edit-bot-proxy-group" style="display:none">
+        <label class="form-label" for="edit-bot-proxy-select">Chọn Proxy</label>
+        <select class="form-input" id="edit-bot-proxy-select">
+          <option value="">-- Không chọn --</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" id="btn-save-bot">Lưu</button>
+      <button class="btn btn-ghost" data-close="overlay-edit-bot">Hủy</button>
+    </div>
+    <div id="edit-bot-err" class="form-error" style="display:none"></div>
+  </div>
+</div>
+
+<div class="overlay" id="overlay-add-bot" role="dialog" aria-modal="true" aria-labelledby="add-bot-title">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 class="modal-title" id="add-bot-title">Thêm Bot Mới</h2>
+      <button class="modal-close" data-close="overlay-add-bot" aria-label="Đóng">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label" for="new-bot-id">ID <span class="req">*</span></label>
+        <input class="form-input" id="new-bot-id" placeholder="bot-1" maxlength="20" autocomplete="off">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" for="new-bot-host">Host <span class="req">*</span></label>
+          <input class="form-input" id="new-bot-host" placeholder="server.com" autocomplete="off">
+        </div>
+        <div class="form-group form-group-sm">
+          <label class="form-label" for="new-bot-port">Port <span class="req">*</span></label>
+          <input class="form-input" id="new-bot-port" value="25565" type="number" autocomplete="off">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" for="new-bot-user">Username <span class="req">*</span></label>
+          <input class="form-input" id="new-bot-user" placeholder="BotName" autocomplete="off">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="new-bot-ver">Version</label>
+          <input class="form-input" id="new-bot-ver" placeholder="1.21.1" autocomplete="off">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="new-bot-pass">Password</label>
+        <input class="form-input" id="new-bot-pass" placeholder="(tùy chọn)" type="password" autocomplete="off">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="new-bot-proxy">Proxy (tùy chọn — nhập index hoặc ID)</label>
+        <input class="form-input" id="new-bot-proxy" placeholder="số thứ tự hoặc ID proxy" type="text" autocomplete="off">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" id="btn-create-bot">Tạo Bot</button>
+      <button class="btn btn-ghost" data-close="overlay-add-bot">Hủy</button>
+    </div>
+    <div id="add-bot-err" class="form-error" style="display:none"></div>
+  </div>
+</div>
+
+<div class="overlay" id="overlay-add-proxy" role="dialog" aria-modal="true" aria-labelledby="add-proxy-title">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 class="modal-title" id="add-proxy-title">Thêm Proxy</h2>
+      <button class="modal-close" data-close="overlay-add-proxy" aria-label="Đóng">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label" for="proxy-type-select">Định dạng Proxy</label>
+        <select class="form-input" id="proxy-type-select">
+          <option value="socks5">SOCKS5</option>
+          <option value="socks4">SOCKS4</option>
+          <option value="http">HTTP</option>
+          <option value="https">HTTPS</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="new-proxy-raw">Proxy (host:port hoặc user:pass@host:port)</label>
+        <input class="form-input" id="new-proxy-raw" placeholder="192.168.1.1:1080 hoặc user:pass@host:1080" autocomplete="off">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="new-proxy-tag">Tag (tùy chọn)</label>
+        <input class="form-input" id="new-proxy-tag" placeholder="US, VN, premium..." autocomplete="off">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" id="btn-add-proxy">Thêm & Kiểm Tra</button>
+      <button class="btn btn-ghost" data-close="overlay-add-proxy">Hủy</button>
+    </div>
+    <div id="add-proxy-status" style="display:none"></div>
+    <div id="add-proxy-msg" class="form-msg" style="display:none"></div>
+  </div>
+</div>
+
+<div class="overlay" id="overlay-shortcuts" role="dialog" aria-modal="true" aria-labelledby="shortcuts-title">
+  <div class="modal" style="max-width:520px">
+    <div class="modal-header">
+      <h2 class="modal-title" id="shortcuts-title">Phím tắt</h2>
+      <button class="modal-close" data-close="overlay-shortcuts" aria-label="Đóng">✕</button>
+    </div>
+    <div class="modal-body shortcuts-body">
+      <div class="kbd-row"><span class="kbd-label">Focus ô lệnh chat</span><span class="kbd-group"><kbd class="kbd">Ctrl</kbd><kbd class="kbd">K</kbd></span></div>
+      <div class="kbd-row"><span class="kbd-label">Đóng modal / sidebar</span><span class="kbd-group"><kbd class="kbd">Esc</kbd></span></div>
+      <div class="kbd-row"><span class="kbd-label">Hiện phím tắt</span><span class="kbd-group"><kbd class="kbd">?</kbd></span></div>
+      <div class="kbd-row"><span class="kbd-label">Chuyển tab Tổng Quan</span><span class="kbd-group"><kbd class="kbd">1</kbd></span></div>
+      <div class="kbd-row"><span class="kbd-label">Chuyển tab Quản Lý</span><span class="kbd-group"><kbd class="kbd">2</kbd></span></div>
+      <div class="kbd-row"><span class="kbd-label">Chuyển tab Console</span><span class="kbd-group"><kbd class="kbd">3</kbd></span></div>
+      <div class="kbd-row"><span class="kbd-label">Chuyển tab Kho Đồ</span><span class="kbd-group"><kbd class="kbd">4</kbd></span></div>
+      <div class="kbd-row"><span class="kbd-label">Chuyển tab Lệnh</span><span class="kbd-group"><kbd class="kbd">5</kbd></span></div>
+      <div class="kbd-row"><span class="kbd-label">Chuyển tab Cấu Hình</span><span class="kbd-group"><kbd class="kbd">6</kbd></span></div>
+      <div class="kbd-row"><span class="kbd-label">Chuyển tab Proxy</span><span class="kbd-group"><kbd class="kbd">7</kbd></span></div>
+      <div class="kbd-row"><span class="kbd-label">Chuyển tab Hệ Thống</span><span class="kbd-group"><kbd class="kbd">8</kbd></span></div>
+      <div class="kbd-row"><span class="kbd-label">Chuyển tab Thống Kê</span><span class="kbd-group"><kbd class="kbd">9</kbd></span></div>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="overlay-msg" role="dialog" aria-modal="true" aria-labelledby="msg-title">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-header">
+      <h2 class="modal-title" id="msg-title">Thông báo</h2>
+      <button class="modal-close" data-close="overlay-msg" aria-label="Đóng">✕</button>
+    </div>
+    <div class="modal-body" id="overlay-msg-body"></div>
+  </div>
+</div>
+
+<div class="overlay" id="overlay-capacity-warn" role="dialog" aria-modal="true" aria-labelledby="cap-title">
+  <div class="modal" style="max-width:460px">
+    <div class="modal-header">
+      <h2 class="modal-title" id="cap-title">Cảnh báo RAM</h2>
+      <button class="modal-close" data-close="overlay-capacity-warn" aria-label="Đóng">✕</button>
+    </div>
+    <div class="modal-body cap-warn-body">
+      <div class="cap-warn-bar-wrap">
+        <div class="cap-warn-bar-track">
+          <div class="cap-warn-bar-fill" id="cap-warn-bar" style="width:0%"></div>
+        </div>
+        <div class="cap-warn-bar-pct" id="cap-warn-pct"></div>
+      </div>
+      <div class="cap-warn-stats" id="cap-warn-stats"></div>
+      <div class="cap-warn-msg">
+        <span class="cap-warn-msg-icon">🛑</span>
+        <span>Vượt quá khuyến nghị có thể gây <strong>treo máy, crash, hoặc mất dữ liệu</strong>. Hãy cân nhắc tắt bớt bot hoặc nâng cấp RAM.</span>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-warn" id="btn-cap-proceed">Thêm bot (vượt qua)</button>
+      <button class="btn btn-ghost" data-close="overlay-capacity-warn">Hủy</button>
+    </div>
+  </div>
+</div>
+
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="/app.js"></script>
+</body>
+</html>

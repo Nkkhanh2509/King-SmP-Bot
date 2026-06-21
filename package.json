@@ -1,0 +1,26 @@
+{
+  "name": "bot-kingsmp",
+  "version": "1.0.0",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "main": "main.js",
+  "scripts": {
+    "start": "node main.js",
+    "start:pm2": "pm2 start ecosystem.config.js",
+    "start:win": "powershell -ExecutionPolicy Bypass -File start-windows.ps1",
+    "clean": "node cleanup.js",
+    "docker:build": "docker build -t antares-manager .",
+    "docker:run": "docker run -p 3000:3000 --env-file .env antares-manager"
+  },
+  "dependencies": {
+    "boxen": "^6.2.1",
+    "chalk": "^4.1.2",
+    "cli-table3": "^0.6.5",
+    "express": "^5.2.1",
+    "mineflayer": "^4.0.0",
+    "socket.io": "^4.8.3",
+    "strip-ansi": "^7.2.0"
+  }
+}

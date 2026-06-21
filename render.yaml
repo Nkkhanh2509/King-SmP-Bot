@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: antares-manager
+    env: node
+    region: singapore
+    plan: starter
+    buildCommand: npm install --production --no-fund --no-audit
+    startCommand: node main.js
+    healthCheckPath: /
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: AUTO_EXE
+        value: "1"
+      - key: SILENT_CONFIG
+        value: "1"
+      - key: SILENT_SOCKET
+        value: "1"

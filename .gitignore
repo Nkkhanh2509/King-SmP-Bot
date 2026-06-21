@@ -1,0 +1,47 @@
+# Dependencies
+node_modules/
+
+# Config backups & temp files
+config.json.bak
+config.json.tmp
+*.tmp
+*.bak
+
+# Environment files
+.env
+.env.local
+.env.production
+
+# Logs
+*.log
+logs/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Build artifacts
+dist/
+build/
+
+# PM2
+ecosystem.config.js
+.pm2/
+
+# Certificates
+*.pem
+*.cert
+*.key
+
+# Zip files
+*.zip
+*.tar.gz
+
+# Render
+.render/
